@@ -25,3 +25,13 @@ export async function sendPasswordReset(email: string) {
   const { data, error } = await supabase.auth.resetPasswordForEmail(email);
   return { data, error };
 }
+
+export async function isUsernameAvailable(username: string) {
+  const { data, error } = await supabase
+    .from('users')
+    .select('id')
+    .eq('username', username)
+    .maybeSingle();
+  if (error) return { available: false, error };
+  return { available: !data, error: null };
+}

@@ -6,7 +6,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors } from '../../theme/colors';
-import { signUp } from '../../lib/auth';
+import { signUp, isUsernameAvailable } from '../../lib/auth';
 
 export default function SignupScreen({ navigation }: any) {
   const [name, setName] = useState('');
@@ -21,13 +21,28 @@ export default function SignupScreen({ navigation }: any) {
       Alert.alert('Missing info', 'Please fill in all fields.');
       return;
     }
+
+    const cleanUsername = username.trim().replace(/^@/, '').toLowerCase();
+
     setLoading(true);
-    const { error } = await signUp(email, password, username, name);
+
+    const { available } = await isUsernameAvailable(cleanUsername);
+    if (!available) {
+      setLoading(false);
+      Alert.alert('Username taken', 'Please choose a different username.');
+      return;
+    }
+
+    const { error } = await signUp(email, password, cleanUsername, name);
     setLoading(false);
+
     if (error) {
       Alert.alert('Signup failed', error.message);
+    } else {
+      Alert.alert('Account created', 'Check your email to confirm your account before logging in.', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') },
+      ]);
     }
-    // On success, useAuth picks up the new session automatically.
   }
 
   return (

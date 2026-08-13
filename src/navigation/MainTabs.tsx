@@ -2,18 +2,14 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
-import PlaceholderScreen from '../screens/PlaceholderScreen';
-// Swap these in as each real screen gets built:
-// import HomeFeedScreen from '../screens/HomeFeedScreen';
-// import SearchScreen from '../screens/SearchScreen';
-// import CreatePostScreen from '../screens/CreatePostScreen';
-// import ProfileScreen from '../screens/ProfileScreen';
+import ProfileStack from './ProfileStack';
+import CreatePostStack from './CreatePostStack';
+import HomeFeedScreen from '../screens/HomeFeedScreen';
 
 const Tab = createBottomTabNavigator();
 
 const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
   HomeFeed: 'home',
-  Search: 'search',
   CreatePost: 'add-circle',
   Profile: 'person',
 };
@@ -31,10 +27,9 @@ export default function MainTabs() {
         ),
       })}
     >
-      <Tab.Screen name="HomeFeed" component={PlaceholderScreen} options={{ title: 'Home' }} />
-      <Tab.Screen name="Search" component={PlaceholderScreen} />
-      <Tab.Screen name="CreatePost" component={PlaceholderScreen} options={{ title: 'Create' }} />
-      <Tab.Screen name="Profile" component={PlaceholderScreen} />
+      <Tab.Screen name="HomeFeed" component={HomeFeedScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="CreatePost" component={CreatePostStack} options={{ title: 'Create' }} />
+      <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
   );
 }
