@@ -12,14 +12,15 @@ type Props = {
   isOwnPost: boolean;
   postId: string;
   onDeleted?: () => void;
+  onShareCardImage?: () => void | Promise<void>;
 };
 
-export default function CardMenu({ visible, onClose, jokeText, isOwnPost, postId, onDeleted }: Props) {
+export default function CardMenu({ visible, onClose, jokeText, isOwnPost, postId, onDeleted, onShareCardImage }: Props) {
   async function handleShareCard() {
     onClose();
-    // Native OS share sheet — WhatsApp, Instagram, and everything else
-    // installed on the phone shows up here automatically, no separate integration needed.
-    await Share.share({ message: `${jokeText}\n\n— shared from Hasya` });
+    // Captures the actual rendered card and opens the native share sheet
+    // (WhatsApp, Instagram, etc. all show up automatically as image-share targets).
+    await onShareCardImage?.();
   }
 
   async function handleShareLink() {

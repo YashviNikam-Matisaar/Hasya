@@ -1,16 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import Avatar from '../components/Avatar';
 import { getMyProfile, Profile } from '../lib/profiles';
+import { getMyPosts, Post } from '../lib/posts';
+import { getMySavedPosts } from '../lib/saves';
 
 type TabKey = 'jokes' | 'saved';
 
 export default function ProfileScreen({ navigation }: any) {
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [myPosts, setMyPosts] = useState<Post[]>([]);
+  const [savedPosts, setSavedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<TabKey>('jokes');
 
@@ -18,6 +22,16 @@ export default function ProfileScreen({ navigation }: any) {
     setLoading(true);
     const { data } = await getMyProfile();
     setProfile(data);
+    if (data) {
+      const { data: posts } = await getMyPosts();
+      setMyPosts(posts ?? []);
+
+      const { data: saves } = await getMySavedPosts();
+      const unwrapped = (saves ?? [])
+        .map((s: any) => s.posts)
+        .filter(Boolean);
+      setSavedPosts(unwrapped);
+    }
     setLoading(false);
   }, []);
 
@@ -82,12 +96,18 @@ export default function ProfileScreen({ navigation }: any) {
         </TouchableOpacity>
       </View>
 
-      {/* Grid will populate once posts/saves exist — empty state for now */}
       <FlatList
-        data={[]}
+        data={activeTab === 'jokes' ? myPosts : savedPosts}
         numColumns={2}
-        keyExtractor={(_, i) => String(i)}
-        renderItem={null}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.gridTile}>
+            <Image source={{ uri: item.templates?.background_asset }} style={styles.gridImage} />
+            <View style={styles.gridTextOverlay}>
+              <Text style={styles.gridText} numberOfLines={3}>{item.joke_text}</Text>
+            </View>
+          </View>
+        )}
         contentContainerStyle={styles.grid}
         ListEmptyComponent={
           <View style={styles.emptyState}>
@@ -129,6 +149,10 @@ const styles = StyleSheet.create({
   tabText: { color: colors.textMuted, fontWeight: '600', fontSize: 14 },
   tabTextActive: { color: colors.text },
   grid: { paddingHorizontal: 16, flexGrow: 1 },
+  gridTile: { flex: 1, margin: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.card },
+  gridImage: { width: '100%', aspectRatio: 0.8, resizeMode: 'cover' },
+  gridTextOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', padding: 10 },
+  gridText: { color: colors.text, fontSize: 11, fontWeight: '700', textAlign: 'center' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
   emptyText: { color: colors.textMuted, fontSize: 14 },
 });

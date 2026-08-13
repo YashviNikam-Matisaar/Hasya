@@ -7,15 +7,15 @@ import CardCanvas from '../components/CardCanvas';
 import { createPost, updatePost } from '../lib/posts';
 
 export default function PreviewPostScreen({ route, navigation }: any) {
-  const { template, jokeText, draftId } = route.params;
+  const { template, jokeText, textColor, draftId } = route.params;
   const [posting, setPosting] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
 
   async function handlePost() {
     setPosting(true);
     const result = draftId
-      ? await updatePost(draftId, { joke_text: jokeText, template_id: template.id, is_draft: false })
-      : await createPost(template.id, jokeText, false);
+      ? await updatePost(draftId, { joke_text: jokeText, template_id: template.id, is_draft: false, text_color: textColor })
+      : await createPost(template.id, jokeText, false, textColor);
     setPosting(false);
 
     if (result.error) {
@@ -31,8 +31,8 @@ export default function PreviewPostScreen({ route, navigation }: any) {
   async function handleSaveDraft() {
     setSavingDraft(true);
     const result = draftId
-      ? await updatePost(draftId, { joke_text: jokeText, template_id: template.id, is_draft: true })
-      : await createPost(template.id, jokeText, true);
+      ? await updatePost(draftId, { joke_text: jokeText, template_id: template.id, is_draft: true, text_color: textColor })
+      : await createPost(template.id, jokeText, true, textColor);
     setSavingDraft(false);
 
     if (result.error) {
@@ -54,7 +54,7 @@ export default function PreviewPostScreen({ route, navigation }: any) {
       </View>
 
       <View style={styles.cardWrap}>
-        <CardCanvas backgroundUrl={template.background_asset} jokeText={jokeText} height={380} />
+        <CardCanvas backgroundUrl={template.background_asset} jokeText={jokeText} height={380} textColor={textColor} />
       </View>
 
       <View style={styles.footerRow}>

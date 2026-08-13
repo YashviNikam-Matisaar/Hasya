@@ -14,6 +14,7 @@ export type Post = {
   is_draft: boolean;
   like_count: number;
   created_at: string;
+  text_color?: string;
   templates?: Template;
 };
 
@@ -22,7 +23,7 @@ export async function getTemplates(): Promise<{ data: Template[] | null; error: 
   return { data, error };
 }
 
-export async function createPost(templateId: string, jokeText: string, isDraft: boolean) {
+export async function createPost(templateId: string, jokeText: string, isDraft: boolean, textColor: string = '#2B1B12') {
   const { data: authData } = await supabase.auth.getUser();
   if (!authData.user) return { data: null, error: 'Not logged in' };
 
@@ -33,6 +34,7 @@ export async function createPost(templateId: string, jokeText: string, isDraft: 
       template_id: templateId,
       joke_text: jokeText,
       is_draft: isDraft,
+      text_color: textColor,
     })
     .select()
     .single();
@@ -40,7 +42,7 @@ export async function createPost(templateId: string, jokeText: string, isDraft: 
   return { data, error };
 }
 
-export async function updatePost(postId: string, updates: { joke_text?: string; template_id?: string; is_draft?: boolean }) {
+export async function updatePost(postId: string, updates: { joke_text?: string; template_id?: string; is_draft?: boolean; text_color?: string }) {
   const { data, error } = await supabase
     .from('posts')
     .update(updates)

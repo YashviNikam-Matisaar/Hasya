@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
@@ -8,9 +8,12 @@ import { createPost, updatePost } from '../lib/posts';
 
 const MAX_LENGTH = 280;
 
+const TEXT_COLORS = ['#2B1B12', '#FFFFFF', '#9A4C41', '#EE2D2C', '#1E4620', '#1B3A5C', '#4A2E1B'];
+
 export default function WriteJokeScreen({ route, navigation }: any) {
   const { template, draft } = route.params;
   const [jokeText, setJokeText] = useState(draft?.joke_text ?? '');
+  const [textColor, setTextColor] = useState(draft?.text_color ?? '#2B1B12');
   const [saving, setSaving] = useState(false);
 
   async function handleSaveDraft() {
@@ -20,8 +23,8 @@ export default function WriteJokeScreen({ route, navigation }: any) {
     }
     setSaving(true);
     const result = draft
-      ? await updatePost(draft.id, { joke_text: jokeText, template_id: template.id, is_draft: true })
-      : await createPost(template.id, jokeText, true);
+      ? await updatePost(draft.id, { joke_text: jokeText, template_id: template.id, is_draft: true, text_color: textColor })
+      : await createPost(template.id, jokeText, true, textColor);
     setSaving(false);
 
     if (result.error) {
@@ -36,48 +39,65 @@ export default function WriteJokeScreen({ route, navigation }: any) {
       Alert.alert('Empty joke', 'Write something before previewing.');
       return;
     }
-    navigation.navigate('PreviewPost', { template, jokeText, draftId: draft?.id ?? null });
+    navigation.navigate('PreviewPost', { template, jokeText, textColor, draftId: draft?.id ?? null });
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={26} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.title}>Write your joke</Text>
-          <TouchableOpacity onPress={handlePreview}>
-            <Text style={styles.nextLink}>Next</Text>
-          </TouchableOpacity>
-        </View>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 20 }}>
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Ionicons name="chevron-back" size={26} color={colors.text} />
+            </TouchableOpacity>
+            <Text style={styles.title}>Write your joke</Text>
+            <TouchableOpacity onPress={handlePreview}>
+              <Text style={styles.nextLink}>Next</Text>
+            </TouchableOpacity>
+          </View>
 
-        <View style={styles.cardWrap}>
-          <CardCanvas backgroundUrl={template.background_asset} jokeText={jokeText} height={320} />
-        </View>
+          <View style={styles.cardWrap}>
+            <CardCanvas backgroundUrl={template.background_asset} jokeText={jokeText} height={320} textColor={textColor} />
+          </View>
 
-        <View style={styles.inputWrap}>
-          <TextInput
-            style={styles.input}
-            placeholder="Write your joke..."
-            placeholderTextColor={colors.textMuted}
-            multiline
-            maxLength={MAX_LENGTH}
-            value={jokeText}
-            onChangeText={setJokeText}
-          />
-          <Text style={styles.counter}>{jokeText.length}/{MAX_LENGTH}</Text>
-        </View>
+          <Text style={styles.colorLabel}>Text Color</Text>
+          <View style={styles.colorRow}>
+            {TEXT_COLORS.map((c) => (
+              <TouchableOpacity
+                key={c}
+                onPress={() => setTextColor(c)}
+                style={[
+                  styles.swatch,
+                  { backgroundColor: c },
+                  textColor === c && styles.swatchSelected,
+                ]}
+              />
+            ))}
+          </View>
 
-        <View style={styles.footerRow}>
-          <TouchableOpacity style={styles.draftButton} onPress={handleSaveDraft} disabled={saving}>
-            <Ionicons name="document-text-outline" size={18} color={colors.text} />
-            <Text style={styles.draftButtonText}>{saving ? 'Saving…' : 'Save Draft'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.previewButton} onPress={handlePreview}>
-            <Text style={styles.previewButtonText}>Preview</Text>
-          </TouchableOpacity>
-        </View>
+          <View style={styles.inputWrap}>
+            <TextInput
+              style={styles.input}
+              placeholder="Write your joke..."
+              placeholderTextColor={colors.textMuted}
+              multiline
+              maxLength={MAX_LENGTH}
+              value={jokeText}
+              onChangeText={setJokeText}
+            />
+            <Text style={styles.counter}>{jokeText.length}/{MAX_LENGTH}</Text>
+          </View>
+
+          <View style={styles.footerRow}>
+            <TouchableOpacity style={styles.draftButton} onPress={handleSaveDraft} disabled={saving}>
+              <Ionicons name="document-text-outline" size={18} color={colors.text} />
+              <Text style={styles.draftButtonText}>{saving ? 'Saving…' : 'Save Draft'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.previewButton} onPress={handlePreview}>
+              <Text style={styles.previewButtonText}>Preview</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -92,6 +112,10 @@ const styles = StyleSheet.create({
   title: { fontSize: 17, fontWeight: '700', color: colors.text },
   nextLink: { color: colors.rust, fontWeight: '700', fontSize: 15 },
   cardWrap: { paddingHorizontal: 20, marginBottom: 16 },
+  colorLabel: { fontSize: 13, color: colors.textMuted, marginLeft: 20, marginBottom: 8 },
+  colorRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 18 },
+  swatch: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: colors.border },
+  swatchSelected: { borderColor: colors.rust, borderWidth: 3 },
   inputWrap: { paddingHorizontal: 20 },
   input: {
     backgroundColor: colors.card,
@@ -111,7 +135,6 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: 20,
     paddingVertical: 16,
-    marginTop: 'auto',
   },
   draftButton: {
     flex: 1,

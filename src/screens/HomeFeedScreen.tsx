@@ -1,29 +1,36 @@
-import React, { useCallback, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TextInput } from 'react-native';
+import React, { useCallback, useState, useRef } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
-import PostCard from '../components/PostCard';
+import SwipeableCard from '../components/SwipeableCard';
 import GestureTooltipOverlay from '../components/GestureTooltipOverlay';
 import { getFeedPosts, FeedPost } from '../lib/feed';
+import { toggleLike, isPostLikedByMe } from '../lib/likes';
+import { toggleSave, isPostSavedByMe } from '../lib/saves';
 
 const TUTORIAL_SEEN_KEY = 'hasya_gesture_tutorial_seen';
 
-export default function HomeFeedScreen() {
+export default function HomeFeedScreen({ navigation }: any) {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
+  // currentIndex points at the post currently on top of the stack
+  const [currentIndex, setCurrentIndex] = useState(0);
+  // history stack of indices seen, so swipe-left (back) has somewhere to go
+  const historyRef = useRef<number[]>([]);
 
   const load = useCallback(async () => {
-  const { data, error } = await getFeedPosts();
-  if (error) console.log('Feed error:', error);
-  setPosts(data ?? []);
-  setLoading(false);
-  setRefreshing(false);
-}, []);
+    setLoading(true);
+    const { data, error } = await getFeedPosts();
+    if (error) console.log('Feed error:', error);
+    setPosts(data ?? []);
+    setCurrentIndex(0);
+    historyRef.current = [];
+    setLoading(false);
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
@@ -31,8 +38,6 @@ export default function HomeFeedScreen() {
     }, [load])
   );
 
-  // One-time gesture tutorial — will actually matter once swipe gestures
-  // are layered on in the next build phase; wired now so it's ready.
   useFocusEffect(
     useCallback(() => {
       AsyncStorage.getItem(TUTORIAL_SEEN_KEY).then((seen) => {
@@ -46,44 +51,74 @@ export default function HomeFeedScreen() {
     setShowTutorial(false);
   }
 
-  function handleRefresh() {
-    setRefreshing(true);
-    load();
+  function goToNext() {
+    historyRef.current.push(currentIndex);
+    setCurrentIndex((i) => Math.min(i + 1, posts.length));
+  }
+
+  function goToPrevious() {
+    const prev = historyRef.current.pop();
+    if (prev !== undefined) {
+      setCurrentIndex(prev);
+    }
+  }
+
+  const currentPost = posts[currentIndex];
+
+  async function handleSwipeUp() {
+    if (!currentPost) return;
+    const wasLiked = await isPostLikedByMe(currentPost.id);
+    await toggleLike(currentPost.id, wasLiked);
+    goToNext();
+  }
+
+  async function handleSwipeDown() {
+    if (!currentPost) return;
+    const wasSaved = await isPostSavedByMe(currentPost.id);
+    await toggleSave(currentPost.id, wasSaved);
+    goToNext();
+  }
+
+  function handleSwipeRight() {
+    goToNext();
+  }
+
+  function handleSwipeLeft() {
+    goToPrevious();
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Text style={styles.logo}>Hasya</Text>
-        <View style={styles.searchBar}>
+        <TouchableOpacity style={styles.searchBar} onPress={() => navigation.navigate('Search')}>
           <Ionicons name="search" size={16} color={colors.textMuted} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search jokes or users..."
-            placeholderTextColor={colors.textMuted}
-            editable={false}
-          />
-        </View>
+          <Text style={styles.searchPlaceholder}>Search jokes or users...</Text>
+        </TouchableOpacity>
       </View>
 
       {loading ? (
         <View style={styles.centered}>
           <ActivityIndicator size="large" color={colors.rust} />
         </View>
+      ) : !currentPost ? (
+        <View style={styles.centered}>
+          <Text style={styles.emptyText}>
+            {posts.length === 0 ? 'No jokes yet — be the first to post!' : "You're all caught up!"}
+          </Text>
+        </View>
       ) : (
-        <FlatList
-          data={posts}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => <PostCard post={item} onDeleted={load} />}
-          refreshing={refreshing}
-          onRefresh={handleRefresh}
-          contentContainerStyle={{ paddingTop: 8, paddingBottom: 24 }}
-          ListEmptyComponent={
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>No jokes yet — be the first to post!</Text>
-            </View>
-          }
-        />
+        <View style={styles.stackArea}>
+          <SwipeableCard
+            key={currentPost.id}
+            post={currentPost}
+            onSwipeUp={handleSwipeUp}
+            onSwipeDown={handleSwipeDown}
+            onSwipeRight={handleSwipeRight}
+            onSwipeLeft={handleSwipeLeft}
+            onDeleted={load}
+          />
+        </View>
       )}
 
       <GestureTooltipOverlay visible={showTutorial} onDismiss={dismissTutorial} />
@@ -93,8 +128,8 @@ export default function HomeFeedScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
-  emptyText: { color: colors.textMuted, fontSize: 14, textAlign: 'center', paddingHorizontal: 40 },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
+  emptyText: { color: colors.textMuted, fontSize: 14, textAlign: 'center' },
   header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 },
   logo: { fontSize: 22, fontWeight: '800', color: colors.rust, marginBottom: 10 },
   searchBar: {
@@ -108,5 +143,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  searchInput: { flex: 1, fontSize: 14, color: colors.text },
+  searchPlaceholder: { fontSize: 14, color: colors.textMuted },
+  stackArea: { flex: 1, justifyContent: 'center' },
 });

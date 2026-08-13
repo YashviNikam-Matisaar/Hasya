@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import ProfileStack from './ProfileStack';
 import CreatePostStack from './CreatePostStack';
-import HomeFeedScreen from '../screens/HomeFeedScreen';
+import HomeStack from './HomeStack';
 
 const Tab = createBottomTabNavigator();
 
@@ -27,7 +27,7 @@ export default function MainTabs() {
         ),
       })}
     >
-      <Tab.Screen name="HomeFeed" component={HomeFeedScreen} options={{ title: 'Home' }} />
+      <Tab.Screen name="HomeFeed" component={HomeStack} options={{ title: 'Home' }} />
       <Tab.Screen name="CreatePost" component={CreatePostStack} options={{ title: 'Create' }} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>
