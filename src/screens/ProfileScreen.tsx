@@ -51,17 +51,22 @@ export default function ProfileScreen({ navigation }: any) {
     );
   }
 
+  // ✅ UPDATED: Cleaner Guest Mode UI with real navigation
   if (!profile) {
-    // Guest mode — no profile row exists
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Text style={styles.guestText}>Couldn't load your profile</Text>
+          <Ionicons name="person-outline" size={64} color={colors.textMuted} style={{ marginBottom: 12 }} />
+          <Text style={styles.guestTitle}>Welcome, Guest!</Text>
+          <Text style={styles.guestText}>
+            Please log in or sign up to view your profile, see your saved jokes, and create new ones.
+          </Text>
+          
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={loadProfile}
+            onPress={() => navigation.navigate('Login')} // ✅ Sends user to Login Screen
           >
-            <Text style={styles.primaryButtonText}>Retry</Text>
+            <Text style={styles.primaryButtonText}>Log In / Sign Up</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -123,10 +128,23 @@ export default function ProfileScreen({ navigation }: any) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24, gap: 16 },
-  guestText: { fontSize: 15, color: colors.textMuted },
-  primaryButton: { backgroundColor: colors.rust, borderRadius: 14, paddingVertical: 14, paddingHorizontal: 24 },
-  primaryButtonText: { color: colors.white, fontWeight: '600' },
+  centered: { 
+    flex: 1, 
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    paddingHorizontal: 30, 
+    gap: 12 
+  },
+  guestTitle: { fontSize: 22, fontWeight: '700', color: colors.text, marginTop: 4 },
+  guestText: { fontSize: 15, color: colors.textMuted, textAlign: 'center', lineHeight: 22, marginBottom: 12 },
+  primaryButton: { 
+    backgroundColor: colors.rust, 
+    borderRadius: 14, 
+    paddingVertical: 14, 
+    paddingHorizontal: 32,
+    marginTop: 4
+  },
+  primaryButtonText: { color: colors.white, fontWeight: '600', fontSize: 16 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
