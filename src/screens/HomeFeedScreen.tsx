@@ -7,6 +7,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { colors } from '../theme/colors';
 import SwipeableCard from '../components/SwipeableCard';
 import GestureTooltipOverlay from '../components/GestureTooltipOverlay';
+import Toast from '../components/Toast';
 import { getFeedPosts, FeedPost } from '../lib/feed';
 import { toggleLike, isPostLikedByMe } from '../lib/likes';
 import { toggleSave, isPostSavedByMe } from '../lib/saves';
@@ -17,15 +18,13 @@ export default function HomeFeedScreen({ navigation }: any) {
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
-  // currentIndex points at the post currently on top of the stack
   const [currentIndex, setCurrentIndex] = useState(0);
-  // history stack of indices seen, so swipe-left (back) has somewhere to go
+  const [toast, setToast] = useState<{ message: string; icon: any } | null>(null);
   const historyRef = useRef<number[]>([]);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await getFeedPosts();
-    if (error) console.log('Feed error:', error);
+    const { data } = await getFeedPosts();
     setPosts(data ?? []);
     setCurrentIndex(0);
     historyRef.current = [];
@@ -63,12 +62,18 @@ export default function HomeFeedScreen({ navigation }: any) {
     }
   }
 
+  function handleRestart() {
+    setCurrentIndex(0);
+    historyRef.current = [];
+  }
+
   const currentPost = posts[currentIndex];
 
   async function handleSwipeUp() {
     if (!currentPost) return;
     const wasLiked = await isPostLikedByMe(currentPost.id);
     await toggleLike(currentPost.id, wasLiked);
+    setToast({ message: wasLiked ? 'Unliked' : 'Liked', icon: wasLiked ? 'heart-outline' : 'heart' });
     goToNext();
   }
 
@@ -76,6 +81,7 @@ export default function HomeFeedScreen({ navigation }: any) {
     if (!currentPost) return;
     const wasSaved = await isPostSavedByMe(currentPost.id);
     await toggleSave(currentPost.id, wasSaved);
+    setToast({ message: wasSaved ? 'Removed from Saved' : 'Saved', icon: wasSaved ? 'bookmark-outline' : 'bookmark' });
     goToNext();
   }
 
@@ -106,20 +112,30 @@ export default function HomeFeedScreen({ navigation }: any) {
           <Text style={styles.emptyText}>
             {posts.length === 0 ? 'No jokes yet — be the first to post!' : "You're all caught up!"}
           </Text>
+          {posts.length > 0 && (
+            <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
+              <Ionicons name="refresh" size={16} color={colors.white} />
+              <Text style={styles.restartButtonText}>Back to Start</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : (
         <View style={styles.stackArea}>
-          <SwipeableCard
-            key={currentPost.id}
-            post={currentPost}
-            onSwipeUp={handleSwipeUp}
-            onSwipeDown={handleSwipeDown}
-            onSwipeRight={handleSwipeRight}
-            onSwipeLeft={handleSwipeLeft}
-            onDeleted={load}
-          />
+          <View style={{ flex: 1 }}>
+            <SwipeableCard
+              key={currentPost.id}
+              post={currentPost}
+              onSwipeUp={handleSwipeUp}
+              onSwipeDown={handleSwipeDown}
+              onSwipeRight={handleSwipeRight}
+              onSwipeLeft={handleSwipeLeft}
+              onDeleted={load}
+            />
+          </View>
         </View>
       )}
+
+      {toast && <Toast message={toast.message} icon={toast.icon} onHide={() => setToast(null)} />}
 
       <GestureTooltipOverlay visible={showTutorial} onDismiss={dismissTutorial} />
     </SafeAreaView>
@@ -144,5 +160,17 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   searchPlaceholder: { fontSize: 14, color: colors.textMuted },
-  stackArea: { flex: 1, justifyContent: 'center' },
+  stackArea: { flex: 1 },
+  counter: { textAlign: 'center', color: colors.textMuted, fontSize: 12, marginBottom: 6, fontWeight: '600' },
+  restartButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: colors.rust,
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    marginTop: 16,
+  },
+  restartButtonText: { color: colors.white, fontWeight: '700', fontSize: 14 },
 });

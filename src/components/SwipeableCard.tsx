@@ -72,7 +72,7 @@ export default function SwipeableCard({ post, onSwipeUp, onSwipeDown, onSwipeRig
   return (
     <GestureDetector gesture={pan}>
       <Animated.View style={[styles.card, animatedStyle]}>
-        <PostCard post={post} onDeleted={onDeleted} />
+        <PostCard post={post} onDeleted={onDeleted} fullScreen />
       </Animated.View>
     </GestureDetector>
   );
@@ -81,5 +81,6 @@ export default function SwipeableCard({ post, onSwipeUp, onSwipeDown, onSwipeRig
 const styles = StyleSheet.create({
   card: {
     width: '100%',
+    flex: 1,
   },
 });

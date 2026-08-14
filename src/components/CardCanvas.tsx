@@ -6,14 +6,15 @@ type Props = {
   jokeText: string;
   height?: number;
   textColor?: string;
+  fillHeight?: boolean; // when true, fills the parent instead of using a fixed height (used in full-screen swipe feed)
 };
 
-export default function CardCanvas({ backgroundUrl, jokeText, height = 380, textColor = '#2B1B12' }: Props) {
+export default function CardCanvas({ backgroundUrl, jokeText, height = 380, textColor = '#2B1B12', fillHeight = false }: Props) {
   return (
     <ImageBackground
       source={{ uri: backgroundUrl }}
-      style={[styles.card, { height }]}
-      imageStyle={styles.image}
+      style={[styles.card, fillHeight ? { flex: 1, borderRadius: 0 } : { height }]}
+      imageStyle={fillHeight ? { borderRadius: 0 } : styles.image}
       resizeMode="cover"
     >
       <View style={styles.overlay}>

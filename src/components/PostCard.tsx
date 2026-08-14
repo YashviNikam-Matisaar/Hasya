@@ -8,49 +8,26 @@ import CardCanvas from './CardCanvas';
 import Avatar from './Avatar';
 import CardMenu from './CardMenu';
 import { FeedPost } from '../lib/feed';
-import { isPostLikedByMe, toggleLike } from '../lib/likes';
-import { isPostSavedByMe, toggleSave } from '../lib/saves';
+import { isPostLikedByMe } from '../lib/likes';
+import { isPostSavedByMe } from '../lib/saves';
 import { supabase } from '../lib/supabase';
 
 type Props = {
   post: FeedPost;
   onDeleted?: () => void;
+  fullScreen?: boolean; // used by the swipeable Home Feed — image fills the available space, gestures replace manual buttons
 };
 
-export default function PostCard({ post, onDeleted }: Props) {
-  const [liked, setLiked] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [likeCount, setLikeCount] = useState(post.like_count);
+export default function PostCard({ post, onDeleted, fullScreen = false }: Props) {
   const [menuVisible, setMenuVisible] = useState(false);
   const [isOwnPost, setIsOwnPost] = useState(false);
   const viewShotRef = useRef<ViewShot>(null);
 
   useEffect(() => {
-    isPostLikedByMe(post.id).then(setLiked);
-    isPostSavedByMe(post.id).then(setSaved);
     supabase.auth.getUser().then(({ data }) => {
       setIsOwnPost(data.user?.id === post.user_id);
     });
   }, [post.id, post.user_id]);
-
-  async function handleLikePress() {
-    const wasLiked = liked;
-    setLiked(!wasLiked);
-    setLikeCount((c) => (wasLiked ? Math.max(c - 1, 0) : c + 1));
-
-    const { error } = await toggleLike(post.id, wasLiked);
-    if (error) {
-      setLiked(wasLiked);
-      setLikeCount((c) => (wasLiked ? c + 1 : Math.max(c - 1, 0)));
-    }
-  }
-
-  async function handleSavePress() {
-    const wasSaved = saved;
-    setSaved(!wasSaved);
-    const { error } = await toggleSave(post.id, wasSaved);
-    if (error) setSaved(wasSaved);
-  }
 
   async function handleShareCardImage() {
     try {
@@ -68,6 +45,44 @@ export default function PostCard({ post, onDeleted }: Props) {
     }
   }
 
+  if (fullScreen) {
+    return (
+      <View style={styles.fullScreenContainer}>
+        {post.templates && (
+          <ViewShot ref={viewShotRef} options={{ format: 'png', quality: 1 }} style={styles.fullScreenShot}>
+            <CardCanvas
+              backgroundUrl={post.templates.background_asset}
+              jokeText={post.joke_text}
+              height={undefined}
+              fillHeight
+              textColor={post.text_color}
+            />
+          </ViewShot>
+        )}
+
+        {/* Poster info + menu overlaid on the card itself */}
+        <View style={styles.overlayHeader}>
+          <Avatar url={post.users?.avatar_url} name={post.users?.name} size={34} />
+          <Text style={styles.overlayName}>{post.users?.name ?? 'Unknown'}</Text>
+          <TouchableOpacity onPress={() => setMenuVisible(true)} hitSlop={10}>
+            <Ionicons name="ellipsis-horizontal" size={20} color={colors.white} />
+          </TouchableOpacity>
+        </View>
+
+        <CardMenu
+          visible={menuVisible}
+          onClose={() => setMenuVisible(false)}
+          jokeText={post.joke_text}
+          isOwnPost={isOwnPost}
+          postId={post.id}
+          onDeleted={onDeleted}
+          onShareCardImage={handleShareCardImage}
+        />
+      </View>
+    );
+  }
+
+  // Normal (non-fullscreen) layout — used in Search results
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -83,16 +98,6 @@ export default function PostCard({ post, onDeleted }: Props) {
           <CardCanvas backgroundUrl={post.templates.background_asset} jokeText={post.joke_text} height={340} textColor={post.text_color} />
         </ViewShot>
       )}
-
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.likeRow} onPress={handleLikePress}>
-          <Ionicons name={liked ? 'heart' : 'heart-outline'} size={22} color={liked ? colors.coral : colors.textMuted} />
-          <Text style={styles.likeCount}>{likeCount}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleSavePress}>
-          <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={20} color={saved ? colors.rust : colors.textMuted} />
-        </TouchableOpacity>
-      </View>
 
       <CardMenu
         visible={menuVisible}
@@ -116,7 +121,25 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   name: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.text },
-  footer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 },
-  likeRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  likeCount: { fontSize: 14, color: colors.textMuted, fontWeight: '600' },
+
+  fullScreenContainer: { flex: 1 },
+  fullScreenShot: { flex: 1, borderRadius: 0 },
+  overlayHeader: {
+    position: 'absolute',
+    top: 14,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    zIndex: 10,
+  },
+  overlayName: {
+    flex: 1,
+    color: colors.white,
+    fontWeight: '700',
+    fontSize: 14,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowRadius: 4,
+  },
 });
