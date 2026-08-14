@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 
 type Props = {
   message: string;
@@ -11,6 +11,8 @@ type Props = {
 };
 
 export default function Toast({ message, icon, onHide }: Props) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   useEffect(() => {
     const timer = setTimeout(onHide, 1200);
     return () => clearTimeout(timer);
@@ -19,14 +21,14 @@ export default function Toast({ message, icon, onHide }: Props) {
   return (
     <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.container} pointerEvents="none">
       <View style={styles.pill}>
-        <Ionicons name={icon} size={16} color={colors.white} />
+        <Ionicons name={icon} size={16} color={theme.white} />
         <Text style={styles.text}>{message}</Text>
       </View>
     </Animated.View>
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: 100,
@@ -44,5 +46,5 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 24,
   },
-  text: { color: colors.white, fontWeight: '600', fontSize: 13 },
+  text: { color: theme.white, fontWeight: '600', fontSize: 13 },
 });

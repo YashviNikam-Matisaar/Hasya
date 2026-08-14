@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 
 type Props = {
   url?: string | null;
@@ -9,6 +9,8 @@ type Props = {
 };
 
 export default function Avatar({ url, name, size = 64 }: Props) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const initial = (name?.trim()?.[0] ?? '?').toUpperCase();
 
   if (url) {
@@ -27,12 +29,12 @@ export default function Avatar({ url, name, size = 64 }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  image: { backgroundColor: colors.border },
+const getStyles = (theme: any) => StyleSheet.create({
+  image: { backgroundColor: theme.border },
   fallback: {
-    backgroundColor: colors.primary,
+    backgroundColor: theme.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  initial: { color: colors.white, fontWeight: '700' },
+  initial: { color: theme.white, fontWeight: '700' },
 });

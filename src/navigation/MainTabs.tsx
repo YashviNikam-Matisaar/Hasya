@@ -3,7 +3,8 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Alert } from 'react-native';
 
-import { colors } from '../theme/colors';
+// ✅ Remove colors import, add useTheme import
+import { useTheme } from '../context/ThemeContext'; 
 import { useAuth } from '../hooks/useAuth';
 
 import ProfileStack from './ProfileStack';
@@ -20,6 +21,7 @@ const iconMap: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 export default function MainTabs() {
   const { session } = useAuth();
+  const { theme } = useTheme(); // ✅ Get the dynamic theme
 
   const handleProfilePress = () => {
     if (!session) {
@@ -40,13 +42,13 @@ export default function MainTabs() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.rust,
-        tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { backgroundColor: colors.card, borderTopColor: colors.border },
+        // ✅ Replace colors with theme
+        tabBarActiveTintColor: theme.rust,
+        tabBarInactiveTintColor: theme.textMuted,
+        tabBarStyle: { backgroundColor: theme.card, borderTopColor: theme.border },
         tabBarIcon: ({ color, size }) => (
           <Ionicons name={iconMap[route.name] ?? 'ellipse'} size={size} color={color} />
         ),
-        // ✅ Add this to ensure icons don't get weirdly spaced out if there are only 2 tabs
         tabBarLabel: route.name === 'CreatePost' ? 'Create' : route.name === 'HomeFeed' ? 'Home' : 'Profile',
       })}
     >

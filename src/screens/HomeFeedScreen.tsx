@@ -4,7 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+
+import { useTheme } from '../context/ThemeContext';
+import { fonts } from '../theme/colors';
+
 import SwipeableCard from '../components/SwipeableCard';
 import GestureTooltipOverlay from '../components/GestureTooltipOverlay';
 import Toast from '../components/Toast';
@@ -15,6 +18,8 @@ import { toggleSave, isPostSavedByMe } from '../lib/saves';
 const TUTORIAL_SEEN_KEY = 'hasya_gesture_tutorial_seen';
 
 export default function HomeFeedScreen({ navigation }: any) {
+  const { theme } = useTheme();
+
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showTutorial, setShowTutorial] = useState(false);
@@ -94,28 +99,41 @@ export default function HomeFeedScreen({ navigation }: any) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.logo}>Hasya</Text>
-        <TouchableOpacity style={styles.searchBar} onPress={() => navigation.navigate('Search')}>
-          <Ionicons name="search" size={16} color={colors.textMuted} />
-          <Text style={styles.searchPlaceholder}>Search jokes or users...</Text>
+        {/* ✅ Correctly uses fonts.nunito.bold */}
+        <Text style={[styles.logo, { color: theme.rust, fontFamily: fonts.nunito.bold }]}>
+          Hasya
+        </Text>
+        
+        <TouchableOpacity 
+          style={[styles.searchBar, { backgroundColor: theme.card, borderColor: theme.border }]} 
+          onPress={() => navigation.navigate('Search')}
+        >
+          <Ionicons name="search" size={16} color={theme.textMuted} />
+          {/* ✅ Correctly uses fonts.roboto.regular */}
+          <Text style={[styles.searchPlaceholder, { color: theme.textMuted, fontFamily: fonts.roboto.regular }]}>
+            Search jokes or users...
+          </Text>
         </TouchableOpacity>
       </View>
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.rust} />
+          <ActivityIndicator size="large" color={theme.rust} />
         </View>
       ) : !currentPost ? (
         <View style={styles.centered}>
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyText, { color: theme.textMuted }]}>
             {posts.length === 0 ? 'No jokes yet — be the first to post!' : "You're all caught up!"}
           </Text>
           {posts.length > 0 && (
-            <TouchableOpacity style={styles.restartButton} onPress={handleRestart}>
-              <Ionicons name="refresh" size={16} color={colors.white} />
-              <Text style={styles.restartButtonText}>Back to Start</Text>
+            <TouchableOpacity 
+              style={[styles.restartButton, { backgroundColor: theme.rust }]} 
+              onPress={handleRestart}
+            >
+              <Ionicons name="refresh" size={16} color={theme.white} />
+              <Text style={[styles.restartButtonText, { color: theme.white }]}>Back to Start</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -142,35 +160,33 @@ export default function HomeFeedScreen({ navigation }: any) {
   );
 }
 
+// Styles using dynamic theme inside the component via inline styles
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 40 },
-  emptyText: { color: colors.textMuted, fontSize: 14, textAlign: 'center' },
+  emptyText: { fontSize: 14, textAlign: 'center' },
   header: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 },
-  logo: { fontSize: 22, fontWeight: '800', color: colors.rust, marginBottom: 10 },
+  logo: { fontSize: 22, fontWeight: '800', marginBottom: 10 },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: colors.card,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: colors.border,
   },
-  searchPlaceholder: { fontSize: 14, color: colors.textMuted },
+  searchPlaceholder: { fontSize: 14 },
   stackArea: { flex: 1 },
-  counter: { textAlign: 'center', color: colors.textMuted, fontSize: 12, marginBottom: 6, fontWeight: '600' },
+  counter: { textAlign: 'center', fontSize: 12, marginBottom: 6, fontWeight: '600' },
   restartButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: colors.rust,
     borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 24,
     marginTop: 16,
   },
-  restartButtonText: { color: colors.white, fontWeight: '700', fontSize: 14 },
+  restartButtonText: { fontWeight: '700', fontSize: 14 },
 });

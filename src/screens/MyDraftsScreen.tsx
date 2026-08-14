@@ -3,10 +3,12 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert, ActivityIndi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import { getMyDrafts, deletePost, Post } from '../lib/posts';
 
 export default function MyDraftsScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [drafts, setDrafts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,7 +53,7 @@ export default function MyDraftsScreen({ navigation }: any) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={26} color={colors.text} />
+          <Ionicons name="chevron-back" size={26} color={theme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>My Drafts</Text>
         <View style={{ width: 26 }} />
@@ -59,7 +61,7 @@ export default function MyDraftsScreen({ navigation }: any) {
 
       {loading ? (
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.rust} />
+          <ActivityIndicator size="large" color={theme.rust} />
         </View>
       ) : (
         <FlatList
@@ -82,10 +84,10 @@ export default function MyDraftsScreen({ navigation }: any) {
               </TouchableOpacity>
               <View style={styles.tileActions}>
                 <TouchableOpacity onPress={() => handleEdit(item)} style={styles.tileActionButton}>
-                  <Ionicons name="create-outline" size={16} color={colors.text} />
+                  <Ionicons name="create-outline" size={16} color={theme.text} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleDelete(item)} style={styles.tileActionButton}>
-                  <Ionicons name="trash-outline" size={16} color={colors.coral} />
+                  <Ionicons name="trash-outline" size={16} color={theme.coral} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -96,22 +98,22 @@ export default function MyDraftsScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
-  emptyText: { color: colors.textMuted, fontSize: 14 },
+  emptyText: { color: theme.textMuted, fontSize: 14 },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16,
   },
-  title: { fontSize: 17, fontWeight: '700', color: colors.text },
+  title: { fontSize: 17, fontWeight: '700', color: theme.text },
   grid: { paddingHorizontal: 14, paddingBottom: 20 },
   tile: {
     flex: 1,
     margin: 6,
     borderRadius: 14,
     overflow: 'hidden',
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
   },
   tileImage: { width: '100%', aspectRatio: 0.8, resizeMode: 'cover' },
  tileTextOverlay: {
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
   alignItems: 'center',
   paddingHorizontal: 10,
 },
-  tileText: { color: colors.white, fontSize: 11, fontWeight: '600' },
+  tileText: { color: theme.white, fontSize: 11, fontWeight: '600' },
   tileActions: {
     flexDirection: 'row',
     justifyContent: 'flex-end',

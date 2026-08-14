@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import { getTemplates, Template } from '../lib/posts';
 
 export default function TemplatePickerScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [templates, setTemplates] = useState<Template[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +30,7 @@ export default function TemplatePickerScreen({ navigation }: any) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.rust} />
+          <ActivityIndicator size="large" color={theme.rust} />
         </View>
       </SafeAreaView>
     );
@@ -38,11 +40,11 @@ export default function TemplatePickerScreen({ navigation }: any) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={26} color={colors.text} />
+          <Ionicons name="chevron-back" size={26} color={theme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Choose a Template</Text>
         <TouchableOpacity onPress={() => navigation.navigate('MyDrafts')}>
-          <Ionicons name="document-text-outline" size={24} color={colors.text} />
+          <Ionicons name="document-text-outline" size={24} color={theme.text} />
         </TouchableOpacity>
       </View>
 
@@ -61,7 +63,7 @@ export default function TemplatePickerScreen({ navigation }: any) {
               <Image source={{ uri: item.background_asset }} style={styles.tileImage} />
               {isSelected && (
                 <View style={styles.checkBadge}>
-                  <Ionicons name="checkmark" size={14} color={colors.white} />
+                  <Ionicons name="checkmark" size={14} color={theme.white} />
                 </View>
               )}
             </TouchableOpacity>
@@ -80,14 +82,14 @@ export default function TemplatePickerScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16,
   },
-  title: { fontSize: 17, fontWeight: '700', color: colors.text },
+  title: { fontSize: 17, fontWeight: '700', color: theme.text },
   grid: { paddingHorizontal: 16, paddingBottom: 16 },
   tile: {
   width: '30%',
@@ -99,14 +101,14 @@ const styles = StyleSheet.create({
   borderColor: 'transparent',
 },
   tileSelected: {
-    borderColor: colors.rust,
+    borderColor: theme.rust,
   },
   tileImage: { width: '100%', height: '100%', resizeMode:"cover" },
   checkBadge: {
     position: 'absolute',
     top: 6,
     right: 6,
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 10,
     width: 20,
     height: 20,
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   nextButton: {
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
@@ -122,5 +124,5 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   nextButtonDisabled: { opacity: 0.4 },
-  nextButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },
+  nextButtonText: { color: theme.white, fontSize: 16, fontWeight: '600' },
 });

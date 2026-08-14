@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import CardCanvas from '../components/CardCanvas';
 import { createPost, updatePost } from '../lib/posts';
 
 export default function PreviewPostScreen({ route, navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const { template, jokeText, textColor, draftId } = route.params;
   const [posting, setPosting] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -47,7 +49,7 @@ export default function PreviewPostScreen({ route, navigation }: any) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={26} color={colors.text} />
+          <Ionicons name="chevron-back" size={26} color={theme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Preview</Text>
         <View style={{ width: 26 }} />
@@ -72,13 +74,13 @@ export default function PreviewPostScreen({ route, navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16,
   },
-  title: { fontSize: 17, fontWeight: '700', color: colors.text },
+  title: { fontSize: 17, fontWeight: '700', color: theme.text },
   cardWrap: { paddingHorizontal: 20, flex: 1, justifyContent: 'center' },
   footerRow: {
     flexDirection: 'row',
@@ -89,18 +91,18 @@ const styles = StyleSheet.create({
   iconButton: {
     flex: 1,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  iconButtonText: { color: colors.text, fontWeight: '600', fontSize: 13 },
+  iconButtonText: { color: theme.text, fontWeight: '600', fontSize: 13 },
   postButton: {
     flex: 1,
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  postButtonText: { color: colors.white, fontWeight: '600', fontSize: 13 },
+  postButtonText: { color: theme.white, fontWeight: '600', fontSize: 13 },
 });

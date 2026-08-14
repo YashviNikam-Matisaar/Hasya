@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, Share, Alert } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import { deletePost } from '../lib/posts';
 
 type Props = {
@@ -16,6 +16,8 @@ type Props = {
 };
 
 export default function CardMenu({ visible, onClose, jokeText, isOwnPost, postId, onDeleted, onShareCardImage }: Props) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   async function handleShareCard() {
     onClose();
     // Captures the actual rendered card and opens the native share sheet
@@ -54,21 +56,21 @@ export default function CardMenu({ visible, onClose, jokeText, isOwnPost, postId
       <TouchableOpacity style={styles.backdrop} activeOpacity={1} onPress={onClose}>
         <View style={styles.sheet}>
           <TouchableOpacity style={styles.row} onPress={handleShareCard}>
-            <Ionicons name="share-social-outline" size={20} color={colors.text} />
+            <Ionicons name="share-social-outline" size={20} color={theme.text} />
             <Text style={styles.rowText}>Share Card</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.row} onPress={handleShareLink}>
-            <Ionicons name="link-outline" size={20} color={colors.text} />
+            <Ionicons name="link-outline" size={20} color={theme.text} />
             <Text style={styles.rowText}>Share Link</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.row} onPress={handleCopyText}>
-            <Ionicons name="copy-outline" size={20} color={colors.text} />
+            <Ionicons name="copy-outline" size={20} color={theme.text} />
             <Text style={styles.rowText}>Copy Text</Text>
           </TouchableOpacity>
           {isOwnPost && (
             <TouchableOpacity style={styles.row} onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={20} color={colors.coral} />
-              <Text style={[styles.rowText, { color: colors.coral }]}>Delete</Text>
+              <Ionicons name="trash-outline" size={20} color={theme.coral} />
+              <Text style={[styles.rowText, { color: theme.coral }]}>Delete</Text>
             </TouchableOpacity>
           )}
           <TouchableOpacity style={styles.cancelRow} onPress={onClose}>
@@ -80,10 +82,10 @@ export default function CardMenu({ visible, onClose, jokeText, isOwnPost, postId
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     paddingTop: 8,
@@ -96,13 +98,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 16,
   },
-  rowText: { fontSize: 15, color: colors.text, fontWeight: '500' },
+  rowText: { fontSize: 15, color: theme.text, fontWeight: '500' },
   cancelRow: {
     marginTop: 8,
     paddingVertical: 16,
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: theme.border,
   },
-  cancelText: { fontSize: 15, color: colors.textMuted, fontWeight: '600' },
+  cancelText: { fontSize: 15, color: theme.textMuted, fontWeight: '600' },
 });

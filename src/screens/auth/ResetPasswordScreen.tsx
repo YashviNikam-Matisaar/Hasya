@@ -13,9 +13,11 @@ import {
 
 import { supabase } from '../../lib/supabase';
 import * as Linking from 'expo-linking';
-import { colors } from '../../theme/colors'; // ✅ Uses your flat colors object
+import { useTheme } from '../../context/ThemeContext'; // ✅ Uses your flat colors object
 
 export default function ResetPasswordScreen() {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
  
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -85,7 +87,7 @@ export default function ResetPasswordScreen() {
             <TextInput
               style={styles.input}
               placeholder="Enter new password"
-              placeholderTextColor={colors.textMuted} // ✅ Fixed
+              placeholderTextColor={theme.textMuted} // ✅ Fixed
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -98,7 +100,7 @@ export default function ResetPasswordScreen() {
             <TextInput
               style={styles.input}
               placeholder="Confirm new password"
-              placeholderTextColor={colors.textMuted} // ✅ Fixed
+              placeholderTextColor={theme.textMuted} // ✅ Fixed
               secureTextEntry
               value={confirmPassword}
               onChangeText={setConfirmPassword}
@@ -112,7 +114,7 @@ export default function ResetPasswordScreen() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color={colors.white} />
+              <ActivityIndicator color={theme.white} />
             ) : (
               <Text style={styles.buttonText}>Update Password</Text>
             )}
@@ -128,10 +130,10 @@ export default function ResetPasswordScreen() {
 }
 
 // ✅ Styles updated to use your exact exported `colors` object
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: theme.background,
   },
   contentContainer: {
     flex: 1,
@@ -141,13 +143,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: colors.rust, // Used rust to match your app's primary auth button
+    color: theme.rust, // Used rust to match your app's primary auth button
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
-    color: colors.textMuted,
+    color: theme.textMuted,
     textAlign: 'center',
     marginBottom: 40,
   },
@@ -160,27 +162,27 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.text,
+    color: theme.text,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 16,
-    color: colors.text,
+    color: theme.text,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
   },
   button: {
-    backgroundColor: colors.rust, // Matches your Login/Signup button
+    backgroundColor: theme.rust, // Matches your Login/Signup button
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 10,
-    shadowColor: colors.rust,
+    shadowColor: theme.rust,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -190,12 +192,12 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: colors.white,
+    color: theme.white,
     fontSize: 16,
     fontWeight: 'bold',
   },
   linkText: {
-    color: colors.rust,
+    color: theme.rust,
     textAlign: 'center',
     marginTop: 20,
     fontSize: 14,

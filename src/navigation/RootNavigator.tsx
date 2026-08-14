@@ -5,7 +5,7 @@ import { View, ActivityIndicator } from 'react-native';
 import * as Linking from 'expo-linking';
 
 import { useAuth } from '../hooks/useAuth';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext'; // ✅ ADD THIS IMPORT
 
 import WelcomeScreen from '../screens/auth/WelcomeScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -16,7 +16,6 @@ import MainTabs from './MainTabs';
 
 const Stack = createNativeStackNavigator();
 
-// ✅ Fixed linking configuration
 const linking = {
   prefixes: ['hasya://'],
   config: {
@@ -26,7 +25,7 @@ const linking = {
       ForgotPassword: 'forgot-password',
       ResetPassword: 'reset-password',
       MainTabs: {
-        path: '', // ✅ Added this to satisfy TypeScript
+        path: '',
         screens: {
           Home: 'feed',
           Profile: 'profile',
@@ -38,11 +37,12 @@ const linking = {
 
 export default function RootNavigator() {
   const { session, loading } = useAuth();
+  const { theme } = useTheme(); // ✅ GET THE DYNAMIC THEME
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
-        <ActivityIndicator size="large" color={colors.rust} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: theme.background }}>
+        <ActivityIndicator size="large" color={theme.rust} />
       </View>
     );
   }

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import ViewShot from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import CardCanvas from './CardCanvas';
 import Avatar from './Avatar';
 import CardMenu from './CardMenu';
@@ -19,6 +19,8 @@ type Props = {
 };
 
 export default function PostCard({ post, onDeleted, fullScreen = false }: Props) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [menuVisible, setMenuVisible] = useState(false);
   const [isOwnPost, setIsOwnPost] = useState(false);
   const viewShotRef = useRef<ViewShot>(null);
@@ -65,7 +67,7 @@ export default function PostCard({ post, onDeleted, fullScreen = false }: Props)
           <Avatar url={post.users?.avatar_url} name={post.users?.name} size={34} />
           <Text style={styles.overlayName}>{post.users?.name ?? 'Unknown'}</Text>
           <TouchableOpacity onPress={() => setMenuVisible(true)} hitSlop={10}>
-            <Ionicons name="ellipsis-horizontal" size={20} color={colors.white} />
+            <Ionicons name="ellipsis-horizontal" size={20} color={theme.white} />
           </TouchableOpacity>
         </View>
 
@@ -89,7 +91,7 @@ export default function PostCard({ post, onDeleted, fullScreen = false }: Props)
         <Avatar url={post.users?.avatar_url} name={post.users?.name} size={36} />
         <Text style={styles.name}>{post.users?.name ?? 'Unknown'}</Text>
         <TouchableOpacity onPress={() => setMenuVisible(true)}>
-          <Ionicons name="ellipsis-horizontal" size={20} color={colors.textMuted} />
+          <Ionicons name="ellipsis-horizontal" size={20} color={theme.textMuted} />
         </TouchableOpacity>
       </View>
 
@@ -112,7 +114,7 @@ export default function PostCard({ post, onDeleted, fullScreen = false }: Props)
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: { marginBottom: 20, paddingHorizontal: 16 },
   header: {
     flexDirection: 'row',
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 10,
   },
-  name: { flex: 1, fontSize: 14, fontWeight: '700', color: colors.text },
+  name: { flex: 1, fontSize: 14, fontWeight: '700', color: theme.text },
 
   fullScreenContainer: { flex: 1 },
   fullScreenShot: { flex: 1, borderRadius: 0 },
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
   },
   overlayName: {
     flex: 1,
-    color: colors.white,
+    color: theme.white,
     fontWeight: '700',
     fontSize: 14,
     textShadowColor: 'rgba(0,0,0,0.5)',

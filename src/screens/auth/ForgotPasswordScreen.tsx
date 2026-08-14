@@ -5,10 +5,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { sendPasswordReset } from '../../lib/auth';
 
 export default function ForgotPasswordScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -31,7 +33,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Ionicons name="chevron-back" size={26} color={colors.text} />
+        <Ionicons name="chevron-back" size={26} color={theme.text} />
       </TouchableOpacity>
 
       <Text style={styles.title}>Forgot Password</Text>
@@ -48,7 +50,7 @@ export default function ForgotPasswordScreen({ navigation }: any) {
       <TextInput
         style={styles.input}
         placeholder="something@example.com"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={theme.textMuted}
         autoCapitalize="none"
         keyboardType="email-address"
         value={email}
@@ -66,37 +68,37 @@ export default function ForgotPasswordScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 24 },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingHorizontal: 24 },
   backButton: { marginTop: 8, marginBottom: 8 },
-  backText: { fontSize: 28, color: colors.text },
-  title: { fontSize: 22, fontWeight: '700', color: colors.text, marginBottom: 24 },
+  backText: { fontSize: 28, color: theme.text },
+  title: { fontSize: 22, fontWeight: '700', color: theme.text, marginBottom: 24 },
   iconCircle: {
     width: 72, height: 72, borderRadius: 36,
-    backgroundColor: colors.border,
+    backgroundColor: theme.border,
     alignItems: 'center', justifyContent: 'center',
     alignSelf: 'center', marginBottom: 20,
   },
   iconText: { fontSize: 28 },
-  description: { fontSize: 14, color: colors.textMuted, textAlign: 'center', marginBottom: 24, lineHeight: 20 },
-  label: { fontSize: 13, color: colors.textMuted, marginBottom: 6 },
+  description: { fontSize: 14, color: theme.textMuted, textAlign: 'center', marginBottom: 24, lineHeight: 20 },
+  label: { fontSize: 13, color: theme.textMuted, marginBottom: 6 },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
   },
   primaryButton: {
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 24,
   },
-  primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },
-  footerLink: { color: colors.rust, fontSize: 14, fontWeight: '700', textAlign: 'center' },
+  primaryButtonText: { color: theme.white, fontSize: 16, fontWeight: '600' },
+  footerLink: { color: theme.rust, fontSize: 14, fontWeight: '700', textAlign: 'center' },
 });

@@ -5,10 +5,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { signUp, isUsernameAvailable } from '../../lib/auth';
 
 export default function SignupScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -50,7 +52,7 @@ export default function SignupScreen({ navigation }: any) {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={26} color={colors.text} />
+            <Ionicons name="chevron-back" size={26} color={theme.text} />
           </TouchableOpacity>
 
           <Text style={styles.title}>Create Account</Text>
@@ -64,7 +66,7 @@ export default function SignupScreen({ navigation }: any) {
             <TextInput
               style={styles.input}
               placeholder="Your Name"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={theme.textMuted}
               value={name}
               onChangeText={setName}
             />
@@ -73,7 +75,7 @@ export default function SignupScreen({ navigation }: any) {
             <TextInput
               style={styles.input}
               placeholder="@username"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={theme.textMuted}
               autoCapitalize="none"
               value={username}
               onChangeText={setUsername}
@@ -83,7 +85,7 @@ export default function SignupScreen({ navigation }: any) {
             <TextInput
               style={styles.input}
               placeholder="something@example.com"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={theme.textMuted}
               autoCapitalize="none"
               keyboardType="email-address"
               value={email}
@@ -95,13 +97,13 @@ export default function SignupScreen({ navigation }: any) {
               <TextInput
                 style={styles.passwordInput}
                 placeholder="password"
-                placeholderTextColor={colors.textMuted}
+                placeholderTextColor={theme.textMuted}
                 secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
               />
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.textMuted} />
+                <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={theme.textMuted} />
               </TouchableOpacity>
             </View>
 
@@ -122,36 +124,36 @@ export default function SignupScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 24 },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingHorizontal: 24 },
   backButton: { marginTop: 8, marginBottom: 8 },
-  backText: { fontSize: 28, color: colors.text },
-  title: { fontSize: 26, fontWeight: '700', color: colors.text, marginBottom: 20 },
+  backText: { fontSize: 28, color: theme.text },
+  title: { fontSize: 26, fontWeight: '700', color: theme.text, marginBottom: 20 },
   avatarPlaceholder: {
     width: 72, height: 72, borderRadius: 36,
-    backgroundColor: colors.border,
+    backgroundColor: theme.border,
     alignItems: 'center', justifyContent: 'center',
     alignSelf: 'center', marginBottom: 20,
   },
-  avatarLetter: { fontSize: 28, color: colors.textMuted, fontWeight: '600' },
+  avatarLetter: { fontSize: 28, color: theme.textMuted, fontWeight: '600' },
   form: { gap: 6 },
-  label: { fontSize: 13, color: colors.textMuted, marginTop: 14, marginBottom: 6 },
+  label: { fontSize: 13, color: theme.textMuted, marginTop: 14, marginBottom: 6 },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
   },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     paddingHorizontal: 16,
   },
@@ -159,20 +161,20 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
   },
   eyeButton: {
     padding: 4,
   },
   primaryButton: {
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 24,
   },
-  primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },
+  primaryButtonText: { color: theme.white, fontSize: 16, fontWeight: '600' },
   footerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
-  footerText: { color: colors.textMuted, fontSize: 14 },
-  footerLink: { color: colors.rust, fontSize: 14, fontWeight: '700' },
+  footerText: { color: theme.textMuted, fontSize: 14 },
+  footerLink: { color: theme.rust, fontSize: 14, fontWeight: '700' },
 });

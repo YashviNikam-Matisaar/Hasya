@@ -1,8 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 
 export default function PlaceholderScreen({ route }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const label = route?.name ?? 'Screen';
   return (
     <View style={styles.container}>
@@ -12,8 +14,8 @@ export default function PlaceholderScreen({ route }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, alignItems: 'center', justifyContent: 'center' },
-  text: { fontSize: 20, fontWeight: '700', color: colors.text },
-  subtext: { fontSize: 14, color: colors.textMuted, marginTop: 6 },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, alignItems: 'center', justifyContent: 'center' },
+  text: { fontSize: 20, fontWeight: '700', color: theme.text },
+  subtext: { fontSize: 14, color: theme.textMuted, marginTop: 6 },
 });

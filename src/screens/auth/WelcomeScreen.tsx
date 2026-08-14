@@ -1,9 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function WelcomeScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.hero}>
@@ -39,10 +41,10 @@ export default function WelcomeScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primaryDark,
+    backgroundColor: theme.primaryDark,
     justifyContent: 'space-between',
     paddingHorizontal: 24,
     paddingVertical: 40,
@@ -57,25 +59,25 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: theme.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
   },
   logoLetter: {
     fontSize: 48,
-    color: colors.primary,
+    color: theme.primary,
     fontWeight: '600',
   },
   title: {
     fontSize: 40,
     fontWeight: '700',
-    color: colors.white,
+    color: theme.white,
     marginBottom: 12,
   },
   subtitle: {
     fontSize: 16,
-    color: colors.primary,
+    color: theme.primary,
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -83,25 +85,25 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   primaryButton: {
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: colors.white,
+    color: theme.white,
     fontSize: 16,
     fontWeight: '600',
   },
   secondaryButton: {
     borderWidth: 1.5,
-    borderColor: colors.primary,
+    borderColor: theme.primary,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
   },
   secondaryButtonText: {
-    color: colors.primary,
+    color: theme.primary,
     fontSize: 16,
     fontWeight: '600',
   },

@@ -11,3 +11,18 @@ export const colors = {
   border: '#EFE3D3',
   white: '#FFFFFF',
 };
+
+// ✅ NOW WITH BOTH FONTS
+export const fonts = {
+  // Nunito for Headings / Titles
+  nunito: {
+    regular: 'Nunito_400Regular',
+    semiBold: 'Nunito_600SemiBold',
+    bold: 'Nunito_700Bold',
+  },
+  // Roboto Condensed for Body / Joke Text
+  roboto: {
+    regular: 'RobotoCondensed_400Regular',
+    bold: 'RobotoCondensed_700Bold',
+  },
+};

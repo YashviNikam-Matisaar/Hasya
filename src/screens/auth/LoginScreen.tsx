@@ -5,10 +5,12 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../context/ThemeContext';
 import { signIn } from '../../lib/auth';
 
 export default function LoginScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +35,7 @@ export default function LoginScreen({ navigation }: any) {
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={26} color={colors.text} />
+          <Ionicons name="chevron-back" size={26} color={theme.text} />
         </TouchableOpacity>
 
         <Text style={styles.title}>Login</Text>
@@ -43,7 +45,7 @@ export default function LoginScreen({ navigation }: any) {
           <TextInput
             style={styles.input}
             placeholder="something@example.com"
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColor={theme.textMuted}
             autoCapitalize="none"
             keyboardType="email-address"
             value={email}
@@ -55,13 +57,13 @@ export default function LoginScreen({ navigation }: any) {
             <TextInput
               style={styles.passwordInput}
               placeholder="password"
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={theme.textMuted}
               secureTextEntry={!showPassword}
               value={password}
               onChangeText={setPassword}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-              <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={colors.textMuted} />
+              <Ionicons name={showPassword ? 'eye-off' : 'eye'} size={20} color={theme.textMuted} />
             </TouchableOpacity>
           </View>
 
@@ -85,29 +87,29 @@ export default function LoginScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 24 },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingHorizontal: 24 },
   backButton: { marginTop: 8, marginBottom: 8 },
-  backText: { fontSize: 28, color: colors.text },
-  title: { fontSize: 26, fontWeight: '700', color: colors.text, marginBottom: 24 },
+  backText: { fontSize: 28, color: theme.text },
+  title: { fontSize: 26, fontWeight: '700', color: theme.text, marginBottom: 24 },
   form: { gap: 6 },
-  label: { fontSize: 13, color: colors.textMuted, marginTop: 14, marginBottom: 6 },
+  label: { fontSize: 13, color: theme.textMuted, marginTop: 14, marginBottom: 6 },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
   },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     paddingHorizontal: 16,
   },
@@ -115,21 +117,21 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
   },
   eyeButton: {
     padding: 4,
   },
-  forgotText: { color: colors.rust, fontSize: 13, textAlign: 'right', marginTop: 10, fontWeight: '600' },
+  forgotText: { color: theme.rust, fontSize: 13, textAlign: 'right', marginTop: 10, fontWeight: '600' },
   primaryButton: {
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 24,
   },
-  primaryButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },
+  primaryButtonText: { color: theme.white, fontSize: 16, fontWeight: '600' },
   footerRow: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
-  footerText: { color: colors.textMuted, fontSize: 14 },
-  footerLink: { color: colors.rust, fontSize: 14, fontWeight: '700' },
+  footerText: { color: theme.textMuted, fontSize: 14 },
+  footerLink: { color: theme.rust, fontSize: 14, fontWeight: '700' },
 });

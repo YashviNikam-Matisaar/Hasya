@@ -3,11 +3,13 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert, ActivityInd
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import Avatar from '../components/Avatar';
 import { getMyProfile, updateMyProfile, uploadAvatar } from '../lib/profiles';
 
 export default function EditProfileScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -78,7 +80,7 @@ export default function EditProfileScreen({ navigation }: any) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.rust} />
+          <ActivityIndicator size="large" color={theme.rust} />
         </View>
       </SafeAreaView>
     );
@@ -88,7 +90,7 @@ export default function EditProfileScreen({ navigation }: any) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={26} color={colors.text} />
+          <Ionicons name="chevron-back" size={26} color={theme.text} />
         </TouchableOpacity>
         <Text style={styles.title}>Account Details</Text>
         <View style={{ width: 26 }} />
@@ -98,7 +100,7 @@ export default function EditProfileScreen({ navigation }: any) {
         <Avatar url={avatarUrl} name={name} size={88} />
         <TouchableOpacity style={styles.changePhoto} onPress={handleChangePhoto} disabled={uploadingPhoto}>
           {uploadingPhoto ? (
-            <ActivityIndicator size="small" color={colors.rust} />
+            <ActivityIndicator size="small" color={theme.rust} />
           ) : (
             <Text style={styles.changePhotoText}>Change Photo</Text>
           )}
@@ -106,7 +108,7 @@ export default function EditProfileScreen({ navigation }: any) {
       </View>
 
       <Text style={styles.label}>Name</Text>
-      <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Your name" placeholderTextColor={colors.textMuted} />
+      <TextInput style={styles.input} value={name} onChangeText={setName} placeholder="Your name" placeholderTextColor={theme.textMuted} />
 
       <Text style={styles.label}>Username</Text>
       <TextInput
@@ -114,7 +116,7 @@ export default function EditProfileScreen({ navigation }: any) {
         value={username}
         onChangeText={setUsername}
         placeholder="username"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={theme.textMuted}
         autoCapitalize="none"
       />
 
@@ -125,34 +127,34 @@ export default function EditProfileScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background, paddingHorizontal: 20 },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background, paddingHorizontal: 20 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingTop: 12, paddingBottom: 16,
   },
-  title: { fontSize: 18, fontWeight: '700', color: colors.text },
+  title: { fontSize: 18, fontWeight: '700', color: theme.text },
   avatarSection: { alignItems: 'center', marginBottom: 24, gap: 10 },
   changePhoto: { paddingVertical: 4 },
-  changePhotoText: { color: colors.rust, fontWeight: '600', fontSize: 14 },
-  label: { fontSize: 13, color: colors.textMuted, marginBottom: 6, marginTop: 14 },
+  changePhotoText: { color: theme.rust, fontWeight: '600', fontSize: 14 },
+  label: { fontSize: 13, color: theme.textMuted, marginBottom: 6, marginTop: 14 },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
   },
   saveButton: {
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
     marginTop: 28,
   },
-  saveButtonText: { color: colors.white, fontSize: 16, fontWeight: '600' },
+  saveButtonText: { color: theme.white, fontSize: 16, fontWeight: '600' },
 });

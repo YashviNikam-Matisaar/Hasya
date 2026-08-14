@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import PostCard from '../components/PostCard';
 import Avatar from '../components/Avatar';
 import { supabase } from '../lib/supabase';
@@ -11,6 +11,8 @@ type UserResult = { id: string; username: string; name: string; avatar_url: stri
 type PostResult = any; // FeedPost shape, reused loosely here
 
 export default function SearchScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<UserResult[]>([]);
@@ -48,14 +50,14 @@ export default function SearchScreen({ navigation }: any) {
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={26} color={colors.text} />
+          <Ionicons name="chevron-back" size={26} color={theme.text} />
         </TouchableOpacity>
         <View style={styles.searchBar}>
-          <Ionicons name="search" size={16} color={colors.textMuted} />
+          <Ionicons name="search" size={16} color={theme.textMuted} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search jokes or people..."
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColor={theme.textMuted}
             value={query}
             onChangeText={handleSearch}
             autoFocus
@@ -64,7 +66,7 @@ export default function SearchScreen({ navigation }: any) {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color={colors.rust} style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color={theme.rust} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
           data={posts}
@@ -99,26 +101,26 @@ export default function SearchScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background },
   centered: { alignItems: 'center', justifyContent: 'center', paddingTop: 60 },
-  emptyText: { color: colors.textMuted, fontSize: 14 },
+  emptyText: { color: theme.textMuted, fontSize: 14 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingTop: 12, paddingBottom: 10 },
   searchBar: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
   },
-  searchInput: { flex: 1, fontSize: 14, color: colors.text },
+  searchInput: { flex: 1, fontSize: 14, color: theme.text },
   usersSection: { paddingHorizontal: 16, paddingBottom: 8 },
   userRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
-  userName: { fontSize: 14, fontWeight: '700', color: colors.text },
-  userHandle: { fontSize: 12, color: colors.textMuted },
+  userName: { fontSize: 14, fontWeight: '700', color: theme.text },
+  userHandle: { fontSize: 12, color: theme.textMuted },
 });

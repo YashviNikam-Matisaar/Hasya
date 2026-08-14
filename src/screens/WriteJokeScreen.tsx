@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import CardCanvas from '../components/CardCanvas';
 import { createPost, updatePost } from '../lib/posts';
 
@@ -11,6 +11,8 @@ const MAX_LENGTH = 280;
 const TEXT_COLORS = ['#2B1B12', '#FFFFFF', '#9A4C41', '#EE2D2C', '#1E4620', '#1B3A5C', '#4A2E1B'];
 
 export default function WriteJokeScreen({ route, navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const { template, draft } = route.params;
   const [jokeText, setJokeText] = useState(draft?.joke_text ?? '');
   const [textColor, setTextColor] = useState(draft?.text_color ?? '#2B1B12');
@@ -48,7 +50,7 @@ export default function WriteJokeScreen({ route, navigation }: any) {
         <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingBottom: 20 }}>
           <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Ionicons name="chevron-back" size={26} color={colors.text} />
+              <Ionicons name="chevron-back" size={26} color={theme.text} />
             </TouchableOpacity>
             <Text style={styles.title}>Write your joke</Text>
             <TouchableOpacity onPress={handlePreview}>
@@ -79,7 +81,7 @@ export default function WriteJokeScreen({ route, navigation }: any) {
             <TextInput
               style={styles.input}
               placeholder="Write your joke..."
-              placeholderTextColor={colors.textMuted}
+              placeholderTextColor={theme.textMuted}
               multiline
               maxLength={MAX_LENGTH}
               value={jokeText}
@@ -90,7 +92,7 @@ export default function WriteJokeScreen({ route, navigation }: any) {
 
           <View style={styles.footerRow}>
             <TouchableOpacity style={styles.draftButton} onPress={handleSaveDraft} disabled={saving}>
-              <Ionicons name="document-text-outline" size={18} color={colors.text} />
+              <Ionicons name="document-text-outline" size={18} color={theme.text} />
               <Text style={styles.draftButtonText}>{saving ? 'Saving…' : 'Save Draft'}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.previewButton} onPress={handlePreview}>
@@ -103,33 +105,33 @@ export default function WriteJokeScreen({ route, navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16,
   },
-  title: { fontSize: 17, fontWeight: '700', color: colors.text },
-  nextLink: { color: colors.rust, fontWeight: '700', fontSize: 15 },
+  title: { fontSize: 17, fontWeight: '700', color: theme.text },
+  nextLink: { color: theme.rust, fontWeight: '700', fontSize: 15 },
   cardWrap: { paddingHorizontal: 20, marginBottom: 16 },
-  colorLabel: { fontSize: 13, color: colors.textMuted, marginLeft: 20, marginBottom: 8 },
+  colorLabel: { fontSize: 13, color: theme.textMuted, marginLeft: 20, marginBottom: 8 },
   colorRow: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 18 },
-  swatch: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: colors.border },
-  swatchSelected: { borderColor: colors.rust, borderWidth: 3 },
+  swatch: { width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: theme.border },
+  swatchSelected: { borderColor: theme.rust, borderWidth: 3 },
   inputWrap: { paddingHorizontal: 20 },
   input: {
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
-    color: colors.text,
+    color: theme.text,
     minHeight: 70,
     textAlignVertical: 'top',
   },
-  counter: { textAlign: 'right', color: colors.textMuted, fontSize: 12, marginTop: 4 },
+  counter: { textAlign: 'right', color: theme.textMuted, fontSize: 12, marginTop: 4 },
   footerRow: {
     flexDirection: 'row',
     gap: 12,
@@ -143,17 +145,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: theme.border,
     borderRadius: 14,
     paddingVertical: 14,
   },
-  draftButtonText: { color: colors.text, fontWeight: '600', fontSize: 14 },
+  draftButtonText: { color: theme.text, fontWeight: '600', fontSize: 14 },
   previewButton: {
     flex: 1,
-    backgroundColor: colors.rust,
+    backgroundColor: theme.rust,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
   },
-  previewButtonText: { color: colors.white, fontWeight: '600', fontSize: 14 },
+  previewButtonText: { color: theme.white, fontWeight: '600', fontSize: 14 },
 });

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, FlatList, 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors } from '../theme/colors';
+import { useTheme } from '../context/ThemeContext';
 import Avatar from '../components/Avatar';
 import { getMyProfile, Profile } from '../lib/profiles';
 import { getMyPosts, Post } from '../lib/posts';
@@ -12,6 +12,8 @@ import { getMySavedPosts } from '../lib/saves';
 type TabKey = 'jokes' | 'saved';
 
 export default function ProfileScreen({ navigation }: any) {
+  const { theme } = useTheme();
+  const styles = getStyles(theme);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [myPosts, setMyPosts] = useState<Post[]>([]);
   const [savedPosts, setSavedPosts] = useState<Post[]>([]);
@@ -45,7 +47,7 @@ export default function ProfileScreen({ navigation }: any) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color={colors.rust} />
+          <ActivityIndicator size="large" color={theme.rust} />
         </View>
       </SafeAreaView>
     );
@@ -56,7 +58,7 @@ export default function ProfileScreen({ navigation }: any) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.centered}>
-          <Ionicons name="person-outline" size={64} color={colors.textMuted} style={{ marginBottom: 12 }} />
+          <Ionicons name="person-outline" size={64} color={theme.textMuted} style={{ marginBottom: 12 }} />
           <Text style={styles.guestTitle}>Welcome, Guest!</Text>
           <Text style={styles.guestText}>
             Please log in or sign up to view your profile, see your saved jokes, and create new ones.
@@ -82,7 +84,7 @@ export default function ProfileScreen({ navigation }: any) {
           <Text style={styles.username}>@{profile.username}</Text>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-          <Ionicons name="settings-outline" size={22} color={colors.text} />
+          <Ionicons name="settings-outline" size={22} color={theme.text} />
         </TouchableOpacity>
       </View>
 
@@ -126,8 +128,8 @@ export default function ProfileScreen({ navigation }: any) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+const getStyles = (theme: any) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: theme.background },
   centered: { 
     flex: 1, 
     alignItems: 'center', 
@@ -135,16 +137,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30, 
     gap: 12 
   },
-  guestTitle: { fontSize: 22, fontWeight: '700', color: colors.text, marginTop: 4 },
-  guestText: { fontSize: 15, color: colors.textMuted, textAlign: 'center', lineHeight: 22, marginBottom: 12 },
+  guestTitle: { fontSize: 22, fontWeight: '700', color: theme.text, marginTop: 4 },
+  guestText: { fontSize: 15, color: theme.textMuted, textAlign: 'center', lineHeight: 22, marginBottom: 12 },
   primaryButton: { 
-    backgroundColor: colors.rust, 
+    backgroundColor: theme.rust, 
     borderRadius: 14, 
     paddingVertical: 14, 
     paddingHorizontal: 32,
     marginTop: 4
   },
-  primaryButtonText: { color: colors.white, fontWeight: '600', fontSize: 16 },
+  primaryButtonText: { color: theme.white, fontWeight: '600', fontSize: 16 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -152,25 +154,25 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 20,
   },
-  name: { fontSize: 18, fontWeight: '700', color: colors.text },
-  username: { fontSize: 14, color: colors.textMuted, marginTop: 2 },
+  name: { fontSize: 18, fontWeight: '700', color: theme.text },
+  username: { fontSize: 14, color: theme.textMuted, marginTop: 2 },
   tabRow: {
     flexDirection: 'row',
     marginHorizontal: 20,
-    backgroundColor: colors.card,
+    backgroundColor: theme.card,
     borderRadius: 12,
     padding: 4,
     marginBottom: 16,
   },
   tab: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
-  tabActive: { backgroundColor: colors.primary },
-  tabText: { color: colors.textMuted, fontWeight: '600', fontSize: 14 },
-  tabTextActive: { color: colors.text },
+  tabActive: { backgroundColor: theme.primary },
+  tabText: { color: theme.textMuted, fontWeight: '600', fontSize: 14 },
+  tabTextActive: { color: theme.text },
   grid: { paddingHorizontal: 16, flexGrow: 1 },
-  gridTile: { flex: 1, margin: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: colors.card },
+  gridTile: { flex: 1, margin: 6, borderRadius: 14, overflow: 'hidden', backgroundColor: theme.card },
   gridImage: { width: '100%', aspectRatio: 0.8, resizeMode: 'cover' },
   gridTextOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center', padding: 10 },
-  gridText: { color: colors.text, fontSize: 11, fontWeight: '700', textAlign: 'center' },
+  gridText: { color: theme.text, fontSize: 11, fontWeight: '700', textAlign: 'center' },
   emptyState: { alignItems: 'center', justifyContent: 'center', paddingTop: 80 },
-  emptyText: { color: colors.textMuted, fontSize: 14 },
+  emptyText: { color: theme.textMuted, fontSize: 14 },
 });
