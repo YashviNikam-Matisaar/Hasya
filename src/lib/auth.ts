@@ -21,8 +21,11 @@ export async function signOut() {
   return { error };
 }
 
+// ✅ Changed: Added the redirectTo option explicitly
 export async function sendPasswordReset(email: string) {
-  const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+  const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'hasya://reset-password',
+  });
   return { data, error };
 }
 
