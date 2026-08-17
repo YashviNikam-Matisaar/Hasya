@@ -148,6 +148,7 @@ export default function HomeFeedScreen({ navigation }: any) {
               onSwipeRight={handleSwipeRight}
               onSwipeLeft={handleSwipeLeft}
               onDeleted={load}
+              canGoBack={historyRef.current.length > 0}
             />
           </View>
         </View>

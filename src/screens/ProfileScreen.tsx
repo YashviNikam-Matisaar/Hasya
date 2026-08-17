@@ -53,7 +53,7 @@ export default function ProfileScreen({ navigation }: any) {
     );
   }
 
-  // ✅ UPDATED: Cleaner Guest Mode UI with real navigation
+  // Guest Mode
   if (!profile) {
     return (
       <SafeAreaView style={styles.container}>
@@ -66,7 +66,20 @@ export default function ProfileScreen({ navigation }: any) {
           
           <TouchableOpacity
             style={styles.primaryButton}
-            onPress={() => navigation.navigate('Login')} // ✅ Sends user to Login Screen
+            onPress={() => {
+              // 🔥 THE CORRECT HIERARCHY FIX:
+              // 1. Get the parent (which is ProfileStack)
+              // 2. Get the PARENT of ProfileStack (which is MainTabs)
+              // 3. Tell MainTabs to navigate to Welcome
+              const mainTabsNav = navigation.getParent()?.getParent();
+              
+              if (mainTabsNav) {
+                mainTabsNav.navigate('Welcome');
+              } else {
+                // Fallback if the hierarchy isn't found
+                navigation.navigate('Welcome');
+              }
+            }}
           >
             <Text style={styles.primaryButtonText}>Log In / Sign Up</Text>
           </TouchableOpacity>

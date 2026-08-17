@@ -46,7 +46,11 @@ export default function SettingsScreen({ navigation }: any) {
         text: 'Log Out',
         style: 'destructive',
         onPress: async () => {
-          await signOut();
+          const { error } = await signOut();
+          if (error) {
+            console.log('Logout error:', error);
+            Alert.alert('Could not log out', typeof error === 'string' ? error : error.message ?? 'Please try again.');
+          }
         },
       },
     ]);
@@ -65,7 +69,7 @@ export default function SettingsScreen({ navigation }: any) {
       <Text style={[styles.sectionLabel, { color: theme.textMuted }]}>ACCOUNT</Text>
       <View style={[styles.section, { backgroundColor: theme.card }]}>
         <Row icon="person-outline" label="Account Details" onPress={() => navigation.navigate('EditProfile')} />
-        <Row icon="lock-closed-outline" label="Change Password" onPress={() => navigation.navigate('ForgotPassword')} />
+        <Row icon="lock-closed-outline" label="Change Password" onPress={() => navigation.navigate('ResetPassword')} />
       </View>
 
       {/* ✅ Add the Dark Mode toggle below here */}

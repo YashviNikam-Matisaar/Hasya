@@ -12,13 +12,12 @@ import {
 } from 'react-native';
 
 import { supabase } from '../../lib/supabase';
-import * as Linking from 'expo-linking';
-import { useTheme } from '../../context/ThemeContext'; // ✅ Uses your flat colors object
+import { useTheme } from '../../context/ThemeContext';
 
-export default function ResetPasswordScreen() {
+export default function ResetPasswordScreen({ navigation }: any) {
   const { theme } = useTheme();
   const styles = getStyles(theme);
- 
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -49,12 +48,19 @@ export default function ResetPasswordScreen() {
 
       Alert.alert(
         'Success',
-        'Your password has been reset successfully. Please login with your new password.',
+        'Your password has been changed. Please log in again with your new password.',
         [
           {
             text: 'OK',
             onPress: () => {
-              Linking.openURL('hasya://login');
+              // ✅ SAFE NAVIGATION: Get the root parent navigator
+              const rootNav = navigation.getParent();
+              if (rootNav) {
+                rootNav.navigate('Welcome');
+              } else {
+                navigation.navigate('Welcome');
+              }
+              setTimeout(() => supabase.auth.signOut(), 100);
             },
           },
         ]
@@ -67,7 +73,14 @@ export default function ResetPasswordScreen() {
   };
 
   const handleGoBackToLogin = () => {
-    Linking.openURL('hasya://login');
+    // ✅ SAFE NAVIGATION: Get the root parent navigator
+    const rootNav = navigation.getParent();
+    if (rootNav) {
+      rootNav.navigate('Welcome');
+    } else {
+      navigation.navigate('Welcome');
+    }
+    setTimeout(() => supabase.auth.signOut(), 100);
   };
 
   return (
@@ -87,7 +100,7 @@ export default function ResetPasswordScreen() {
             <TextInput
               style={styles.input}
               placeholder="Enter new password"
-              placeholderTextColor={theme.textMuted} // ✅ Fixed
+              placeholderTextColor={theme.textMuted}
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -100,7 +113,7 @@ export default function ResetPasswordScreen() {
             <TextInput
               style={styles.input}
               placeholder="Confirm new password"
-              placeholderTextColor={theme.textMuted} // ✅ Fixed
+              placeholderTextColor={theme.textMuted}
               secureTextEntry
               value={confirmPassword}
               onChangeText={setConfirmPassword}
@@ -129,7 +142,6 @@ export default function ResetPasswordScreen() {
   );
 }
 
-// ✅ Styles updated to use your exact exported `colors` object
 const getStyles = (theme: any) => StyleSheet.create({
   container: {
     flex: 1,
@@ -143,7 +155,7 @@ const getStyles = (theme: any) => StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: theme.rust, // Used rust to match your app's primary auth button
+    color: theme.rust,
     marginBottom: 8,
     textAlign: 'center',
   },
@@ -176,7 +188,7 @@ const getStyles = (theme: any) => StyleSheet.create({
     borderColor: theme.border,
   },
   button: {
-    backgroundColor: theme.rust, // Matches your Login/Signup button
+    backgroundColor: theme.rust,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
@@ -203,4 +215,4 @@ const getStyles = (theme: any) => StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-});
+});;

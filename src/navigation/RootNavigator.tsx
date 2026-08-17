@@ -5,7 +5,7 @@ import { View, ActivityIndicator } from 'react-native';
 import * as Linking from 'expo-linking';
 
 import { useAuth } from '../hooks/useAuth';
-import { useTheme } from '../context/ThemeContext'; // ✅ ADD THIS IMPORT
+import { useTheme } from '../context/ThemeContext';
 
 import WelcomeScreen from '../screens/auth/WelcomeScreen';
 import LoginScreen from '../screens/auth/LoginScreen';
@@ -20,12 +20,13 @@ const linking = {
   prefixes: ['hasya://'],
   config: {
     screens: {
+      Welcome: 'welcome',
       Login: 'login',
       Signup: 'signup',
       ForgotPassword: 'forgot-password',
       ResetPassword: 'reset-password',
       MainTabs: {
-        path: '',
+        path: 'app',
         screens: {
           Home: 'feed',
           Profile: 'profile',
@@ -37,7 +38,7 @@ const linking = {
 
 export default function RootNavigator() {
   const { session, loading } = useAuth();
-  const { theme } = useTheme(); // ✅ GET THE DYNAMIC THEME
+  const { theme } = useTheme();
 
   if (loading) {
     return (
@@ -47,21 +48,26 @@ export default function RootNavigator() {
     );
   }
 
+  // 💡 CRITICAL FIX: Use a 'key' prop on NavigationContainer.
+  // When session changes (login/logout), this forces the entire navigation tree 
+  // to completely reset, preventing crashes and freezes.
   return (
-    <NavigationContainer linking={linking}>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {session ? (
-          <Stack.Screen name="MainTabs" component={MainTabs} />
-        ) : (
-          <>
-            <Stack.Screen name="Welcome" component={WelcomeScreen} />
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Signup" component={SignupScreen} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-            <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-          </>
-        )}
+    <NavigationContainer key={session ? 'loggedIn' : 'loggedOut'} linking={linking}>
+      <Stack.Navigator 
+        screenOptions={{ headerShown: false }}
+        // 💡 We only set the starting screen here. The stack is static, not conditional.
+        initialRouteName={session ? 'MainTabs' : 'Welcome'}
+      >
+        {/* 
+          We register ALL screens in a single stack. 
+          This guarantees that `navigation.getParent()` will ALWAYS find 'Welcome'.
+        */}
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+        <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen name="MainTabs" component={MainTabs} />
       </Stack.Navigator>
     </NavigationContainer>
   );
