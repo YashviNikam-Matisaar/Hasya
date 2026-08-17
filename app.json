@@ -33,7 +33,8 @@
           "backgroundColor": "#4A2E1B",
           "imageWidth": 500
         }
-      ]
+      ],
+      "expo-font"
     ],
     "extra": {
       "eas": {
