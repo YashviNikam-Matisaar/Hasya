@@ -12,6 +12,8 @@ export type FeedPost = {
   users: { username: string; name: string; avatar_url: string | null } | null;
 };
  
+
+
 export async function getFeedPosts(): Promise<{ data: FeedPost[] | null; error: any }> {
   const { data, error } = await supabase
     .from('posts')
